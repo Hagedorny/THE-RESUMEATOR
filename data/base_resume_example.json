@@ -1,0 +1,65 @@
+{
+  "name": "Alex Johnson",
+  "contact": {
+    "email": "alex.johnson@email.com",
+    "website": "",
+    "portfolio": "",
+    "phone": "555-000-1234"
+  },
+  "professional_summary": "Professional with 5 years of experience in project coordination and operations support. Skilled in managing workflows, communicating across teams, and solving problems under deadline pressure. Looking to grow into a role with more responsibility in operations, project management, or team leadership.",
+  "core_skills": [
+    "Project Coordination",
+    "Team Communication",
+    "Problem Solving",
+    "Microsoft Office Suite",
+    "Scheduling & Calendar Management",
+    "Data Entry & Reporting",
+    "Customer Service",
+    "Process Improvement",
+    "Time Management",
+    "Cross-Department Collaboration"
+  ],
+  "experience": [
+    {
+      "title": "Operations Coordinator",
+      "company": "Greenfield Partners",
+      "dates": "2022-Present",
+      "bullets": [
+        "Coordinated daily operations across three departments supporting 50+ staff",
+        "Managed project timelines and tracked deliverables to ensure deadlines were met",
+        "Created weekly status reports for leadership summarizing progress and blockers",
+        "Improved the onboarding process reducing new hire setup time by 40%"
+      ]
+    },
+    {
+      "title": "Administrative Assistant",
+      "company": "Bright River LLC",
+      "dates": "2019-2022",
+      "bullets": [
+        "Provided administrative support to a team of 15 including scheduling, travel, and expense reports",
+        "Organized company events and meetings for groups of 20-100 attendees",
+        "Maintained filing systems and internal documentation ensuring easy retrieval",
+        "Handled incoming communications and directed requests to appropriate team members"
+      ]
+    }
+  ],
+  "certifications": [
+    "Google Project Management Certificate",
+    "CPR/First Aid Certified"
+  ],
+  "education": [
+    {
+      "degree": "B.A. Communications",
+      "school": "State University"
+    }
+  ],
+  "technical_projects": [
+    {
+      "name": "Process Improvement Initiative",
+      "bullets": [
+        "Redesigned the team's task tracking workflow using Trello, reducing missed deadlines by 25%",
+        "Documented standard operating procedures for recurring monthly reports"
+      ]
+    }
+  ]
+}

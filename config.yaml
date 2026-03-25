@@ -1,0 +1,15 @@
+# Resume Tailoring Agent v2 - Config
+anthropic:
+  model: "claude-sonnet-4-6-20250217"
+  model_light: "claude-haiku-4-5-20251001"
+
+server:
+  host: "127.0.0.1"
+  port: 8000
+
+output:
+  max_pages: 2
+  history_dir: "history"
+
+resume_path: "data/base_resume.json"
+profiles_dir: "data/profiles"

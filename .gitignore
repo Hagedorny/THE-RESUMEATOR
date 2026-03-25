@@ -1,0 +1,6 @@
+.env
+data/base_resume.json
+history/
+__pycache__/
+*.pyc
+.venv/

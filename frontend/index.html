@@ -1,0 +1,1796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE RESUMEATOR</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #232733;
+    --border: #2e3345;
+    --text: #e2e4ea;
+    --text-dim: #8b8fa3;
+    --accent: #4f8ff7;
+    --accent-hover: #3a7be0;
+    --green: #34d399;
+    --green-bg: rgba(52,211,153,0.1);
+    --red: #f87171;
+    --red-bg: rgba(248,113,113,0.1);
+    --yellow: #fbbf24;
+    --yellow-bg: rgba(251,191,36,0.1);
+    --font: 'Segoe UI', -apple-system, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.6; }
+
+  .header {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 16px 32px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .header h1 { font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: #e50914; text-shadow: 0 0 10px rgba(229,9,20,0.5), 0 0 20px rgba(229,9,20,0.3); }
+  .header .status { font-size: 13px; color: var(--text-dim); }
+
+  .main { max-width: 1200px; margin: 0 auto; padding: 24px 32px; }
+
+  .steps { display: flex; gap: 8px; margin-bottom: 24px; }
+  .step {
+    padding: 8px 20px; border-radius: 6px; font-size: 13px; font-weight: 500;
+    background: var(--surface); border: 1px solid var(--border); color: var(--text-dim);
+  }
+  .step.active { background: var(--accent); border-color: var(--accent); color: white; }
+  .step.done { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 24px; margin-bottom: 20px;
+  }
+  .card h2 { font-size: 15px; font-weight: 600; margin-bottom: 16px; }
+
+  textarea, input[type="text"] {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 6px; padding: 12px; color: var(--text);
+    font-family: var(--font); font-size: 14px; resize: vertical;
+  }
+  textarea:focus, input[type="text"]:focus { outline: none; border-color: var(--accent); }
+  textarea { min-height: 200px; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 20px; border-radius: 6px; font-size: 13px;
+    font-weight: 500; border: none; cursor: pointer; transition: all 0.15s;
+  }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-success { background: var(--green); color: #0f1117; }
+  .btn-danger { background: var(--red-bg); color: var(--red); border: 1px solid var(--red); }
+  .btn-outline { background: transparent; color: var(--text-dim); border: 1px solid var(--border); }
+  .btn-outline:hover { border-color: var(--text-dim); color: var(--text); }
+  .btn-sm { padding: 6px 14px; font-size: 12px; }
+  .btn-group { display: flex; gap: 8px; margin-top: 12px; }
+
+  .suggestion {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 16px; margin-bottom: 12px;
+  }
+  .suggestion.approved { border-color: var(--green); background: var(--green-bg); }
+  .suggestion.rejected { border-color: var(--red); background: var(--red-bg); opacity: 0.6; }
+  .suggestion.edited { border-color: var(--yellow); background: var(--yellow-bg); }
+
+  .suggestion-label {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.5px; color: var(--text-dim); margin-bottom: 6px;
+  }
+  .suggestion-reasoning { font-size: 12px; color: var(--text-dim); margin-top: 8px; font-style: italic; }
+  .suggestion-warning { font-size: 12px; color: var(--yellow); margin-top: 4px; }
+
+  .original-text {
+    padding: 10px; background: var(--bg); border-radius: 4px; font-size: 13px;
+    margin-bottom: 8px; color: var(--text-dim); border-left: 3px solid var(--border);
+  }
+  .suggested-text {
+    padding: 10px; background: var(--bg); border-radius: 4px;
+    font-size: 13px; border-left: 3px solid var(--accent);
+  }
+  .edit-area {
+    width: 100%; background: var(--bg); border: 1px solid var(--yellow);
+    border-radius: 4px; padding: 10px; color: var(--text);
+    font-family: var(--font); font-size: 13px; min-height: 60px; resize: vertical; margin-top: 8px;
+  }
+
+  .skills-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+  .skill-tag { padding: 4px 10px; border-radius: 4px; font-size: 12px; background: var(--surface2); border: 1px solid var(--border); }
+  .skill-tag.added { border-color: var(--green); color: var(--green); }
+  .skill-tag.removed { border-color: var(--red); color: var(--red); text-decoration: line-through; }
+
+  /* Tag editor */
+  .tag-editor { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; min-height: 48px; }
+  .tag-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px 8px; border-radius: 4px; font-size: 12px;
+    background: var(--surface2); border: 1px solid var(--border);
+    cursor: grab; user-select: none;
+  }
+  .tag-chip.tag-added { border-color: var(--green); color: var(--green); }
+  .tag-chip.tag-removed { border-color: var(--red); color: var(--red); text-decoration: line-through; }
+  .tag-chip.drag-over { opacity: 0.4; }
+  .tag-chip .tag-x {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 14px; height: 14px; border-radius: 50%;
+    font-size: 10px; line-height: 1; cursor: pointer;
+    background: rgba(255,255,255,0.1); border: none; color: inherit;
+    flex-shrink: 0;
+  }
+  .tag-chip .tag-x:hover { background: rgba(255,255,255,0.25); }
+  .tag-add-row { display: flex; gap: 6px; margin-top: 8px; align-items: center; }
+  .tag-add-row input { width: 160px; font-size: 12px; padding: 5px 8px; }
+
+  .keywords { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .kw { padding: 3px 8px; border-radius: 3px; font-size: 11px; }
+  .kw-match { background: var(--green-bg); color: var(--green); }
+  .kw-miss { background: var(--red-bg); color: var(--red); }
+
+  .score-badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 20px; font-size: 14px; font-weight: 600; background: var(--surface2); border: 1px solid var(--border); }
+  .score-before { color: var(--yellow); }
+  .score-arrow { color: var(--text-dim); font-size: 12px; }
+  .score-after { color: var(--green); }
+  .section-score { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 10px; background: var(--surface2); border: 1px solid var(--border); margin-left: 8px; }
+  .score-high { background: var(--green-bg); color: var(--green); }
+  .score-med { background: var(--yellow-bg); color: var(--yellow); }
+  .score-low { background: var(--red-bg); color: var(--red); }
+
+  .loading { display: flex; align-items: center; gap: 12px; padding: 20px; color: var(--text-dim); }
+  .spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .hidden { display: none !important; }
+
+  .action-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 0; border-top: 1px solid var(--border); margin-top: 16px;
+  }
+  .action-bar .count { font-size: 13px; color: var(--text-dim); }
+
+  /* Resume management panel */
+  .panel-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+    z-index: 100; align-items: flex-start; justify-content: flex-end;
+  }
+  .panel-overlay.open { display: flex; }
+  .panel {
+    background: var(--surface); border-left: 1px solid var(--border);
+    width: 480px; height: 100vh; overflow-y: auto;
+    padding: 28px 28px 40px; display: flex; flex-direction: column; gap: 20px;
+  }
+  .panel h2 { font-size: 16px; font-weight: 600; }
+  .panel-section {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 16px;
+  }
+  .panel-section label { font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.5px; color: var(--text-dim); display: block; margin-bottom: 8px; }
+  .json-editor {
+    width: 100%; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; padding: 10px; color: var(--text);
+    font-family: 'Consolas', 'Courier New', monospace; font-size: 12px;
+    min-height: 300px; resize: vertical;
+  }
+  .json-editor:focus { outline: none; border-color: var(--accent); }
+  .upload-area {
+    border: 2px dashed var(--border); border-radius: 8px; padding: 24px;
+    text-align: center; cursor: pointer; transition: border-color 0.15s;
+  }
+  .upload-area:hover, .upload-area.drag-over { border-color: var(--accent); }
+  .upload-area p { font-size: 13px; color: var(--text-dim); margin-top: 6px; }
+  .upload-status { font-size: 12px; margin-top: 8px; }
+  .redo-row { display: flex; gap: 6px; margin-top: 8px; align-items: center; }
+  .redo-row input { flex: 1; font-size: 12px; padding: 6px 10px; }
+  .card-spinner { width: 14px; height: 14px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; display: inline-block; }
+
+  /* PDF preview modal */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+    z-index: 200; align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    width: 90vw; max-width: 900px; display: flex; flex-direction: column; gap: 16px;
+    padding: 24px; max-height: 96vh;
+  }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; }
+  .modal-header h2 { font-size: 15px; font-weight: 600; }
+  .modal iframe {
+    width: 100%; height: 80vh; border: 1px solid var(--border); border-radius: 6px;
+    background: #fff;
+  }
+  .modal-footer { display: flex; align-items: center; gap: 10px; }
+  .modal-footer input[type="text"] { flex: 1; }
+  .modal-footer .ext { font-size: 12px; color: var(--text-dim); white-space: nowrap; }
+
+  /* Profiles panel */
+  .profile-card {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px; margin-bottom: 10px;
+  }
+  .profile-card h3 { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .profile-card .profile-meta { font-size: 11px; color: var(--text-dim); margin-bottom: 8px; }
+  .profile-editor { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+  .profile-editor label { font-size: 11px; color: var(--text-dim); display: block; margin-bottom: 2px; }
+  .profile-editor textarea { min-height: 80px; font-size: 12px; }
+  .profile-count { font-size: 11px; color: var(--text-dim); }
+
+  /* Cover letter card */
+  .cl-textarea {
+    width: 100%; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; padding: 14px; color: var(--text);
+    font-family: var(--font); font-size: 13px; line-height: 1.7;
+    min-height: 340px; resize: vertical;
+  }
+  .cl-textarea:focus { outline: none; border-color: var(--accent); }
+  .cl-meta { font-size: 11px; color: var(--text-dim); margin-top: 6px; }
+  .cl-controls { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .btn-tone { background: var(--surface2); color: var(--text-dim); border: 1px solid var(--border); }
+  .btn-tone:hover, .btn-tone.active { border-color: var(--accent); color: var(--accent); }
+
+
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>The Resumeator</h1>
+  <div style="display:flex; align-items:center; gap:16px;">
+    <button class="btn btn-outline btn-sm" onclick="openResumePanel()">Manage Resume</button>
+    <div class="status" id="statusText">Ready</div>
+  </div>
+</div>
+
+<!-- Resume Management Panel -->
+<div class="panel-overlay" id="resumePanel">
+  <div class="panel">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h2>Resume Management</h2>
+      <button class="btn btn-outline btn-sm" onclick="closeResumePanel()">Close</button>
+    </div>
+
+    <div class="panel-section">
+      <label>Current Resume</label>
+      <div style="font-size:14px; font-weight:500;" id="resumeNameDisplay">Loading...</div>
+    </div>
+
+    <div class="panel-section">
+      <label>Edit Resume JSON</label>
+      <textarea class="json-editor" id="jsonEditor" spellcheck="false"></textarea>
+      <div class="btn-group" style="margin-top:10px;">
+        <button class="btn btn-primary btn-sm" onclick="saveResumeJson()">Save Changes</button>
+        <button class="btn btn-outline btn-sm" onclick="reloadJsonEditor()">Reset</button>
+      </div>
+      <div id="jsonSaveStatus" class="upload-status"></div>
+    </div>
+
+    <div class="panel-section">
+      <label>Upload New Resume PDF</label>
+      <div class="upload-area" id="uploadArea" onclick="document.getElementById('pdfFileInput').click()"
+           ondragover="event.preventDefault(); this.classList.add('drag-over')"
+           ondragleave="this.classList.remove('drag-over')"
+           ondrop="handleDrop(event)">
+        <div style="font-size:24px;">&#128196;</div>
+        <p>Click or drag a PDF here to upload</p>
+        <p style="font-size:11px; margin-top:4px;">Will be parsed and replace the current resume</p>
+      </div>
+      <input type="file" id="pdfFileInput" accept=".pdf" class="hidden" onchange="handlePdfUpload(this.files[0])">
+      <div id="uploadStatus" class="upload-status"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Save as Profile Modal -->
+<div class="modal-overlay" id="saveProfileModal">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-header">
+      <h2>Save as Profile</h2>
+      <button class="btn btn-outline btn-sm" onclick="closeSaveProfileModal()">Cancel</button>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:10px;">
+      <div>
+        <label style="font-size:12px; color:var(--text-dim); display:block; margin-bottom:4px;">Profile name</label>
+        <input type="text" id="saveProfileName" placeholder="e.g. NOC / Network Operations" style="width:100%; font-size:13px;" />
+      </div>
+      <div>
+        <label style="font-size:12px; color:var(--text-dim); display:block; margin-bottom:4px;">Target roles (comma separated)</label>
+        <input type="text" id="saveProfileRoles" placeholder="NOC Analyst, Network Operations, Network Technician" style="width:100%; font-size:13px;" />
+      </div>
+      <div style="font-size:12px; color:var(--text-dim);">This will save your approved summary, skills, and bullet changes as a reusable starting point.</div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn btn-primary" onclick="confirmSaveProfile()">Save Profile</button>
+        <button class="btn btn-outline" id="updateExistingProfileBtn" onclick="confirmUpdateProfile()" style="display:none;">Update Existing Profile</button>
+      </div>
+      <div id="saveProfileStatus" style="font-size:12px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Profiles Management Panel -->
+<div class="panel-overlay" id="profilesPanel">
+  <div class="panel">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h2>Resume Profiles</h2>
+      <button class="btn btn-outline btn-sm" onclick="closeProfilesPanel()">Close</button>
+    </div>
+    <div style="font-size:13px; color:var(--text-dim);">
+      Save up to 5 resume variants for different role types. Each profile stores a custom summary, skills order, and bullet tweaks.
+    </div>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span class="profile-count" id="profileCountLabel"></span>
+      <button class="btn btn-primary btn-sm" id="createProfileBtn" onclick="startCreateProfile()">+ Create New Profile</button>
+    </div>
+    <div id="newProfileForm" class="panel-section hidden">
+      <label style="font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-dim); display:block; margin-bottom:8px;">New Profile</label>
+      <input type="text" id="newProfileName" placeholder="Profile name (e.g. NOC / Network Operations)" style="font-size:13px; margin-bottom:6px;" />
+      <div style="font-size:11px; color:var(--text-dim); margin-bottom:6px;">Start from: <select id="newProfileBase" style="background:var(--surface2); border:1px solid var(--border); color:var(--text); border-radius:4px; padding:2px 6px; font-size:11px;"><option value="">Base Resume</option></select></div>
+      <div class="btn-group" style="margin-top:6px;">
+        <button class="btn btn-primary btn-sm" onclick="createProfile()">Create</button>
+        <button class="btn btn-outline btn-sm" onclick="cancelCreateProfile()">Cancel</button>
+      </div>
+    </div>
+    <div id="profilesList"></div>
+  </div>
+</div>
+
+<!-- PDF Preview Modal -->
+<div class="modal-overlay" id="pdfModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>PDF Preview</h2>
+      <button class="btn btn-outline btn-sm" onclick="closePreview()">Back to Editing</button>
+    </div>
+    <iframe id="pdfPreviewFrame" title="PDF Preview"></iframe>
+    <div class="modal-footer">
+      <input type="text" id="previewFilenameInput" placeholder="filename" />
+      <span class="ext">.pdf</span>
+      <button class="btn btn-success" onclick="downloadPreview()">Download</button>
+    </div>
+  </div>
+</div>
+
+<!-- Cover Letter PDF Preview Modal -->
+<div class="modal-overlay" id="clPdfModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Cover Letter Preview</h2>
+      <button class="btn btn-outline btn-sm" onclick="closeCLPreview()">Back to Editing</button>
+    </div>
+    <iframe id="clPdfPreviewFrame" title="Cover Letter Preview"></iframe>
+    <div class="modal-footer">
+      <input type="text" id="clPreviewFilenameInput" placeholder="filename" />
+      <span class="ext">.pdf</span>
+      <button class="btn btn-success" onclick="downloadCLPreview()">Download</button>
+    </div>
+  </div>
+</div>
+
+<!-- Welcome Screen (shown when no resume exists yet) -->
+<div id="welcomeScreen" class="hidden" style="max-width:600px; margin:80px auto; padding:0 32px;">
+  <div class="card" style="text-align:center; padding:40px 32px;">
+    <h1 style="font-size:28px; font-weight:800; text-transform:uppercase; letter-spacing:0.12em; color:#e50914; text-shadow: 0 0 10px rgba(229,9,20,0.5), 0 0 20px rgba(229,9,20,0.3); margin-bottom:16px;">The Resumeator</h1>
+    <p style="color:var(--text-dim); margin-bottom:12px; font-size:15px;">AI-powered resume tailoring. Paste a job description, review Claude's suggestions, approve or reject each change, and export a clean PDF.</p>
+    <p style="color:var(--text-dim); margin-bottom:32px; font-size:13px;">No resume found. Load the example to explore the tool, or upload your own resume PDF to get started.</p>
+    <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="loadExampleResume()" style="padding:12px 28px; font-size:14px;">Load Example Resume</button>
+      <button class="btn btn-outline" onclick="openResumePanel()" style="padding:12px 28px; font-size:14px;">Upload Your Resume PDF</button>
+    </div>
+    <div id="welcomeStatus" style="margin-top:20px; font-size:13px; color:var(--text-dim);"></div>
+    <div style="margin-top:28px; padding-top:20px; border-top:1px solid var(--border); text-align:left;">
+      <div style="font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-dim); margin-bottom:10px;">First Time Setup</div>
+      <ul style="font-size:13px; color:var(--text-dim); padding-left:18px; line-height:1.8;">
+        <li>Load the example resume to explore the tool with sample data</li>
+        <li>Or upload your resume PDF and Claude will parse it automatically</li>
+        <li>Your resume is stored locally in <code style="background:var(--surface2); padding:1px 5px; border-radius:3px;">data/base_resume.json</code></li>
+        <li>Works for any profession — tech, business, creative, healthcare, and more</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="main" id="mainContent">
+  <div class="steps">
+    <div class="step active" id="step1">1. Paste Job Description</div>
+    <div class="step" id="step2">2. Review Suggestions</div>
+    <div class="step" id="step3">3. Export PDF</div>
+  </div>
+
+  <!-- Step 1 -->
+  <div id="inputSection">
+    <div class="card" style="margin-bottom:14px; padding:16px 24px;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <label style="font-size:12px; color:var(--text-dim); white-space:nowrap;">Resume Profile:</label>
+        <select id="profileSelect" onchange="onProfileSelect()" style="flex:1; background:var(--surface2); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:6px 10px; font-size:13px;">
+          <option value="">Base Resume (no profile)</option>
+        </select>
+        <span id="profileSelectCount" class="profile-count"></span>
+        <button class="btn btn-outline btn-sm" onclick="openProfilesPanel()">Manage Profiles</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Paste the Job Description</h2>
+      <textarea id="jdInput" placeholder="Paste the full job description here..."></textarea>
+      <div class="btn-group">
+        <button class="btn btn-primary" id="analyzeBtn" onclick="analyze()">Analyze and Generate Suggestions</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div id="loadingSection" class="hidden">
+    <div class="card">
+      <div class="loading">
+        <div class="spinner"></div>
+        <span>Analyzing job description and generating suggestions...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <div id="reviewSection" class="hidden">
+    <div class="card hidden" id="reqCheckCard">
+      <h2>Requirements Check</h2>
+      <div id="hardMissingSection" class="hidden" style="margin-bottom:12px;">
+        <div class="suggestion-label" style="color:var(--red);">Hard Requirements Missing</div>
+        <ul id="hardMissingList" style="font-size:13px; color:var(--red); padding-left:18px; margin-top:6px;"></ul>
+      </div>
+      <div id="worthNotingSection" class="hidden">
+        <div class="suggestion-label" style="color:var(--yellow);">Worth Noting</div>
+        <ul id="worthNotingList" style="font-size:13px; color:var(--yellow); padding-left:18px; margin-top:6px;"></ul>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h2 style="margin:0;"><span id="roleTitle"></span> at <span id="companyName"></span></h2>
+        <span class="score-badge" id="scoreBadge"></span>
+      </div>
+      <div>
+        <div class="suggestion-label">Keywords Matched</div>
+        <div class="keywords" id="kwMatched"></div>
+      </div>
+      <div style="margin-top:12px;">
+        <div class="suggestion-label">Keywords Missing</div>
+        <div class="keywords" id="kwMissing"></div>
+      </div>
+      <div style="margin-top:12px;">
+        <div class="suggestion-label">ATS Tips</div>
+        <ul id="atsTips" style="font-size:13px; color:var(--text-dim); padding-left:18px;"></ul>
+      </div>
+    </div>
+
+    <div class="card"><h2>Professional Summary</h2><div id="summarySuggestion"></div></div>
+    <div class="card"><h2>Core Skills</h2><div id="skillsSuggestion"></div></div>
+    <div class="card"><h2>Experience Bullets</h2><div id="experienceSuggestions"></div></div>
+
+    <!-- Cover Letter Card -->
+    <div class="card hidden" id="coverLetterCard">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h2 style="margin:0;">Cover Letter</h2>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <span id="clSpinner" class="card-spinner hidden"></span>
+          <button class="btn btn-outline btn-sm" onclick="exportCoverLetterPdf()">Export Cover Letter PDF</button>
+        </div>
+      </div>
+      <div id="clReasoningText" class="suggestion-reasoning hidden" style="margin-bottom:10px;"></div>
+      <textarea class="cl-textarea" id="clTextarea" oninput="updateClMeta()" placeholder="Cover letter will appear here..."></textarea>
+      <div class="cl-meta" id="clMeta"></div>
+      <div class="cl-controls">
+        <span style="font-size:11px; color:var(--text-dim); align-self:center;">Length:</span>
+        <button class="btn btn-sm btn-tone" id="cl-len-short" onclick="setCLLength('short')">Short (150 words)</button>
+        <button class="btn btn-sm btn-tone active" id="cl-len-standard" onclick="setCLLength('standard')">Standard (200 words)</button>
+        <button class="btn btn-sm btn-tone" id="cl-len-long" onclick="setCLLength('long')">Detailed (300 words)</button>
+        <span style="font-size:11px; color:var(--text-dim); align-self:center; margin-left:8px;">Tone:</span>
+        <button class="btn btn-sm btn-tone" onclick="setCLTone('formal')">More Formal</button>
+        <button class="btn btn-sm btn-tone" onclick="setCLTone('conversational')">More Conversational</button>
+        <button class="btn btn-sm btn-tone" onclick="setCLTone('confident')">More Confident</button>
+      </div>
+      <div class="redo-row" style="margin-top:10px;">
+        <input type="text" id="clFeedbackInput" placeholder="Direction for Redo (optional, e.g. 'focus more on the Cisco lab')" />
+        <button class="btn btn-sm btn-primary" onclick="regenerateCoverLetter()">Redo</button>
+      </div>
+
+      <!-- Closing block editor -->
+      <div style="margin-top:18px; border-top:1px solid var(--border); padding-top:14px;">
+        <div class="suggestion-label" style="margin-bottom:10px;">Customize Closing</div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <label style="font-size:12px; color:var(--text-dim); width:110px; flex-shrink:0;">Closing phrase</label>
+            <input type="text" id="clClosingPhrase" value="Sincerely," style="flex:1; font-size:13px; padding:6px 10px;" />
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <label style="font-size:12px; color:var(--text-dim); width:110px; flex-shrink:0;">Name</label>
+            <input type="text" id="clClosingName" style="flex:1; font-size:13px; padding:6px 10px;" />
+          </div>
+          <div style="display:flex; align-items:flex-start; gap:10px;">
+            <label style="font-size:12px; color:var(--text-dim); width:110px; flex-shrink:0; padding-top:6px;">Contact lines</label>
+            <textarea id="clClosingContact" rows="3" style="flex:1; font-size:13px; padding:6px 10px; background:var(--surface2); border:1px solid var(--border); border-radius:6px; color:var(--text); resize:vertical; font-family:var(--font);"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-bar">
+      <div class="count" id="approvalCount">0 of 0 reviewed</div>
+      <div class="btn-group">
+        <button class="btn btn-outline" onclick="resetAll()">Start Over</button>
+        <button class="btn btn-outline" id="saveProfileBtn" onclick="openSaveProfileModal()" disabled>Save as Profile</button>
+        <button class="btn btn-outline" id="generateCLBtn" onclick="generateCoverLetter()" disabled>Generate Cover Letter</button>
+        <button class="btn btn-success" id="exportBtn" onclick="exportPdf()">Export PDF</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let baseResume = null;
+let suggestions = null;
+let decisions = {};
+let profiles = [];
+let activeProfile = null;  // currently selected profile object or null
+
+async function init() {
+  try {
+    const res = await fetch('/api/resume');
+    if (res.status === 404) {
+      showWelcomeScreen();
+      await loadProfiles();
+      return;
+    }
+    baseResume = await res.json();
+    setStatus('Resume loaded');
+  } catch (e) {
+    setStatus('Error loading resume');
+  }
+  await loadProfiles();
+}
+init();
+
+function showWelcomeScreen() {
+  document.getElementById('welcomeScreen').classList.remove('hidden');
+  document.getElementById('mainContent').classList.add('hidden');
+}
+
+function hideWelcomeScreen() {
+  document.getElementById('welcomeScreen').classList.add('hidden');
+  document.getElementById('mainContent').classList.remove('hidden');
+}
+
+async function loadExampleResume() {
+  const status = document.getElementById('welcomeStatus');
+  if (status) { status.textContent = 'Loading example resume...'; status.style.color = 'var(--text-dim)'; }
+  try {
+    const res = await fetch('/api/load-example', { method: 'POST' });
+    if (!res.ok) throw new Error('Failed to load example');
+    baseResume = await res.json();
+    hideWelcomeScreen();
+    setStatus('Example resume loaded');
+    await loadProfiles();
+  } catch (e) {
+    if (status) { status.textContent = 'Error: ' + e.message; status.style.color = 'var(--red)'; }
+  }
+}
+
+// ── Profile helpers ────────────────────────────────────────────────────────
+
+async function loadProfiles() {
+  try {
+    const res = await fetch('/api/profiles');
+    profiles = await res.json();
+  } catch (e) {
+    profiles = [];
+  }
+  renderProfileSelector();
+}
+
+function renderProfileSelector() {
+  const sel = document.getElementById('profileSelect');
+  const count = document.getElementById('profileSelectCount');
+  if (!sel) return;
+  const current = sel.value;
+  sel.innerHTML = '<option value="">Base Resume (no profile)</option>';
+  profiles.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.filename;
+    opt.textContent = p.profile_name;
+    sel.appendChild(opt);
+  });
+  if (current) sel.value = current;
+  if (count) count.textContent = profiles.length + '/5';
+}
+
+function onProfileSelect() {
+  const sel = document.getElementById('profileSelect');
+  const filename = sel.value;
+  activeProfile = profiles.find(p => p.filename === filename) || null;
+}
+
+function getEffectiveResume() {
+  if (!activeProfile) return baseResume;
+  return {
+    ...baseResume,
+    professional_summary: activeProfile.summary || baseResume.professional_summary,
+    core_skills: activeProfile.core_skills?.length ? activeProfile.core_skills : baseResume.core_skills,
+  };
+}
+
+// ── Profiles panel ─────────────────────────────────────────────────────────
+
+function openProfilesPanel() {
+  renderProfilesList();
+  document.getElementById('profilesPanel').classList.add('open');
+}
+
+function closeProfilesPanel() {
+  document.getElementById('profilesPanel').classList.remove('open');
+  cancelCreateProfile();
+}
+
+function renderProfilesList() {
+  const list = document.getElementById('profilesList');
+  const countLabel = document.getElementById('profileCountLabel');
+  const createBtn = document.getElementById('createProfileBtn');
+  const baseSelect = document.getElementById('newProfileBase');
+
+  if (countLabel) countLabel.textContent = profiles.length + ' / 5 profiles used';
+  if (createBtn) createBtn.disabled = profiles.length >= 5;
+
+  // Update base select options
+  if (baseSelect) {
+    baseSelect.innerHTML = '<option value="">Base Resume</option>';
+    profiles.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.filename;
+      opt.textContent = p.profile_name;
+      baseSelect.appendChild(opt);
+    });
+  }
+
+  if (!list) return;
+  if (profiles.length === 0) {
+    list.innerHTML = '<div style="font-size:13px; color:var(--text-dim); padding:12px 0;">No profiles yet. Create one to get started.</div>';
+    return;
+  }
+
+  list.innerHTML = profiles.map(p => `
+    <div class="profile-card" id="pcard-${p.filename}">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div>
+          <h3>${esc(p.profile_name)}</h3>
+          <div class="profile-meta">
+            ${p.target_roles?.length ? esc(p.target_roles.join(', ')) + ' &bull; ' : ''}
+            Last used: ${esc(p.last_used || p.created || '—')}
+          </div>
+        </div>
+        <div style="display:flex; gap:6px; flex-shrink:0;">
+          <button class="btn btn-outline btn-sm" onclick="toggleProfileEdit('${p.filename}')">Edit</button>
+          <button class="btn btn-outline btn-sm" onclick="duplicateProfile('${p.filename}')">Duplicate</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteProfile('${p.filename}')">Delete</button>
+        </div>
+      </div>
+      <div class="profile-editor hidden" id="pedit-${p.filename}">
+        <div>
+          <label>Profile name</label>
+          <input type="text" id="pname-${p.filename}" value="${esc(p.profile_name)}" style="font-size:13px; width:100%;" />
+        </div>
+        <div>
+          <label>Target roles (comma separated)</label>
+          <input type="text" id="proles-${p.filename}" value="${esc((p.target_roles||[]).join(', '))}" style="font-size:13px; width:100%;" />
+        </div>
+        <div>
+          <label>Summary</label>
+          <textarea class="edit-area" id="psummary-${p.filename}">${esc(p.summary || '')}</textarea>
+        </div>
+        <div>
+          <label>Skills (one per line)</label>
+          <textarea class="edit-area" id="pskills-${p.filename}" rows="4">${esc((p.core_skills||[]).join('\n'))}</textarea>
+        </div>
+        <div class="btn-group" style="margin-top:4px;">
+          <button class="btn btn-primary btn-sm" onclick="saveProfileEdit('${p.filename}')">Save</button>
+          <button class="btn btn-outline btn-sm" onclick="toggleProfileEdit('${p.filename}')">Cancel</button>
+        </div>
+        <div id="pedit-status-${p.filename}" style="font-size:12px;"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleProfileEdit(filename) {
+  const editor = document.getElementById('pedit-' + filename);
+  if (editor) editor.classList.toggle('hidden');
+}
+
+async function saveProfileEdit(filename) {
+  const name = document.getElementById('pname-' + filename)?.value.trim();
+  const roles = document.getElementById('proles-' + filename)?.value.trim();
+  const summary = document.getElementById('psummary-' + filename)?.value.trim();
+  const skillsRaw = document.getElementById('pskills-' + filename)?.value.trim();
+  const status = document.getElementById('pedit-status-' + filename);
+
+  const skills = skillsRaw ? skillsRaw.split('\n').map(s => s.trim()).filter(Boolean) : [];
+  const target_roles = roles ? roles.split(',').map(r => r.trim()).filter(Boolean) : [];
+
+  try {
+    const res = await fetch('/api/profiles/' + filename, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ profile_name: name, summary, core_skills: skills, target_roles }),
+    });
+    if (!res.ok) throw new Error((await res.json()).detail || 'Save failed');
+    await loadProfiles();
+    renderProfilesList();
+    if (status) { status.textContent = 'Saved.'; status.style.color = 'var(--green)'; }
+  } catch (e) {
+    if (status) { status.textContent = 'Error: ' + e.message; status.style.color = 'var(--red)'; }
+  }
+}
+
+async function deleteProfile(filename) {
+  if (!confirm('Delete this profile?')) return;
+  try {
+    const res = await fetch('/api/profiles/' + filename, { method: 'DELETE' });
+    if (!res.ok) throw new Error((await res.json()).detail || 'Delete failed');
+    await loadProfiles();
+    renderProfilesList();
+    if (activeProfile?.filename === filename) {
+      activeProfile = null;
+      document.getElementById('profileSelect').value = '';
+    }
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
+}
+
+async function duplicateProfile(filename) {
+  if (profiles.length >= 5) return alert('Maximum of 5 profiles reached.');
+  const newName = prompt('Name for the duplicate:', '');
+  if (newName === null) return;
+  try {
+    const res = await fetch('/api/profiles/duplicate/' + filename, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ profile_name: newName }),
+    });
+    if (!res.ok) throw new Error((await res.json()).detail || 'Duplicate failed');
+    await loadProfiles();
+    renderProfilesList();
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
+}
+
+function startCreateProfile() {
+  if (profiles.length >= 5) return alert('Maximum of 5 profiles reached.');
+  document.getElementById('newProfileForm').classList.remove('hidden');
+  document.getElementById('newProfileName').focus();
+}
+
+function cancelCreateProfile() {
+  const form = document.getElementById('newProfileForm');
+  if (form) form.classList.add('hidden');
+  const nameEl = document.getElementById('newProfileName');
+  if (nameEl) nameEl.value = '';
+}
+
+async function createProfile() {
+  const name = document.getElementById('newProfileName')?.value.trim();
+  if (!name) return alert('Please enter a profile name.');
+
+  const baseFilename = document.getElementById('newProfileBase')?.value;
+  let startData = { summary: '', core_skills: [], bullet_overrides: {}, target_roles: [] };
+
+  if (baseFilename) {
+    const src = profiles.find(p => p.filename === baseFilename);
+    if (src) {
+      startData = {
+        summary: src.summary || '',
+        core_skills: (src.core_skills || []).slice(),
+        bullet_overrides: { ...(src.bullet_overrides || {}) },
+        target_roles: (src.target_roles || []).slice(),
+      };
+    }
+  } else if (baseResume) {
+    startData.summary = baseResume.professional_summary || '';
+    startData.core_skills = (baseResume.core_skills || []).slice();
+  }
+
+  try {
+    const res = await fetch('/api/profiles', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ profile_name: name, ...startData }),
+    });
+    if (!res.ok) throw new Error((await res.json()).detail || 'Create failed');
+    await loadProfiles();
+    renderProfilesList();
+    cancelCreateProfile();
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
+}
+
+// ── Save as Profile ─────────────────────────────────────────────────────────
+
+function openSaveProfileModal() {
+  const modal = document.getElementById('saveProfileModal');
+  const nameEl = document.getElementById('saveProfileName');
+  const updateBtn = document.getElementById('updateExistingProfileBtn');
+  const status = document.getElementById('saveProfileStatus');
+
+  // Pre-fill from active profile if one is selected
+  if (activeProfile) {
+    nameEl.value = activeProfile.profile_name;
+    document.getElementById('saveProfileRoles').value = (activeProfile.target_roles || []).join(', ');
+    updateBtn.style.display = '';
+    updateBtn.textContent = 'Update "' + activeProfile.profile_name + '"';
+  } else {
+    nameEl.value = '';
+    document.getElementById('saveProfileRoles').value = (suggestions?.role ? suggestions.role : '');
+    updateBtn.style.display = 'none';
+  }
+  if (status) status.textContent = '';
+  modal.classList.add('open');
+}
+
+function closeSaveProfileModal() {
+  document.getElementById('saveProfileModal').classList.remove('open');
+}
+
+function _buildProfileFromDecisions() {
+  const bulletOverrides = {};
+  (suggestions?.experience_suggestions || []).forEach((exp, i) => {
+    const d = decisions['exp_' + i];
+    if (d?.status === 'approved') {
+      bulletOverrides[`${exp.job_index}-${exp.bullet_index}`] = d.value;
+    }
+  });
+  return {
+    summary: decisions.summary?.status === 'approved' ? decisions.summary.value : (baseResume?.professional_summary || ''),
+    core_skills: decisions.skills && (decisions.skills.status === 'approved' || decisions.skills.status === 'edited')
+      ? JSON.parse(decisions.skills.value)
+      : (baseResume?.core_skills || []),
+    bullet_overrides: bulletOverrides,
+  };
+}
+
+async function confirmSaveProfile() {
+  const name = document.getElementById('saveProfileName')?.value.trim();
+  const roles = document.getElementById('saveProfileRoles')?.value.trim();
+  const status = document.getElementById('saveProfileStatus');
+  if (!name) { status.textContent = 'Please enter a name.'; status.style.color = 'var(--red)'; return; }
+
+  if (profiles.length >= 5 && !activeProfile) {
+    status.textContent = 'Maximum 5 profiles reached.'; status.style.color = 'var(--red)'; return;
+  }
+
+  const target_roles = roles ? roles.split(',').map(r => r.trim()).filter(Boolean) : [];
+  const profileData = { profile_name: name, target_roles, ..._buildProfileFromDecisions() };
+
+  try {
+    const res = await fetch('/api/profiles', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(profileData),
+    });
+    if (!res.ok) throw new Error((await res.json()).detail || 'Save failed');
+    await loadProfiles();
+    status.textContent = 'Profile saved.'; status.style.color = 'var(--green)';
+    setTimeout(closeSaveProfileModal, 1200);
+  } catch (e) {
+    status.textContent = 'Error: ' + e.message; status.style.color = 'var(--red)';
+  }
+}
+
+async function confirmUpdateProfile() {
+  if (!activeProfile) return;
+  const status = document.getElementById('saveProfileStatus');
+  const roles = document.getElementById('saveProfileRoles')?.value.trim();
+  const name = document.getElementById('saveProfileName')?.value.trim() || activeProfile.profile_name;
+  const target_roles = roles ? roles.split(',').map(r => r.trim()).filter(Boolean) : activeProfile.target_roles;
+  const profileData = { profile_name: name, target_roles, ..._buildProfileFromDecisions() };
+
+  try {
+    const res = await fetch('/api/profiles/' + activeProfile.filename, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(profileData),
+    });
+    if (!res.ok) throw new Error((await res.json()).detail || 'Update failed');
+    await loadProfiles();
+    status.textContent = 'Profile updated.'; status.style.color = 'var(--green)';
+    setTimeout(closeSaveProfileModal, 1200);
+  } catch (e) {
+    status.textContent = 'Error: ' + e.message; status.style.color = 'var(--red)';
+  }
+}
+
+async function analyze() {
+  const jd = document.getElementById('jdInput').value.trim();
+  if (!jd) return alert('Please paste a job description first.');
+  window._lastJd = jd;
+
+  document.getElementById('analyzeBtn').disabled = true;
+  document.getElementById('inputSection').classList.add('hidden');
+  document.getElementById('loadingSection').classList.remove('hidden');
+  setStatus('Analyzing...');
+
+  try {
+    const res = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ job_description: jd })
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail || 'Analysis failed');
+    }
+    suggestions = await res.json();
+    decisions = {};
+    window._skillEditorList = null;
+    renderReview();
+    document.getElementById('loadingSection').classList.add('hidden');
+    document.getElementById('reviewSection').classList.remove('hidden');
+    setStep(2);
+    setStatus('Review suggestions');
+  } catch (e) {
+    alert('Error: ' + e.message);
+    document.getElementById('loadingSection').classList.add('hidden');
+    document.getElementById('inputSection').classList.remove('hidden');
+    document.getElementById('analyzeBtn').disabled = false;
+    setStatus('Ready');
+  }
+}
+
+function renderReview() {
+  document.getElementById('roleTitle').textContent = suggestions.role || 'Unknown Role';
+  document.getElementById('companyName').textContent = suggestions.company || 'Unknown Company';
+
+  const before = suggestions.match_score_before || 0;
+  const after = suggestions.match_score_after || 0;
+  const badge = document.getElementById('scoreBadge');
+  badge.className = 'score-badge';
+  badge.innerHTML = '<span class="score-before">' + before + '%</span>' +
+    '<span class="score-arrow">&rarr;</span>' +
+    '<span class="score-after">' + after + '%</span>';
+
+  document.getElementById('kwMatched').innerHTML = (suggestions.keywords_matched || [])
+    .map(k => '<span class="kw kw-match">' + esc(k) + '</span>').join('');
+  document.getElementById('kwMissing').innerHTML = (suggestions.keywords_missing || [])
+    .map(k => '<span class="kw kw-miss">' + esc(k) + '</span>').join('');
+  document.getElementById('atsTips').innerHTML = (suggestions.ats_tips || [])
+    .map(t => '<li>' + esc(t) + '</li>').join('');
+
+  const hard = suggestions.hard_requirements_missing || [];
+  const noting = suggestions.worth_noting || [];
+  const reqCard = document.getElementById('reqCheckCard');
+  const hardSection = document.getElementById('hardMissingSection');
+  const notingSection = document.getElementById('worthNotingSection');
+
+  if (hard.length > 0 || noting.length > 0) {
+    reqCard.classList.remove('hidden');
+    if (hard.length > 0) {
+      hardSection.classList.remove('hidden');
+      document.getElementById('hardMissingList').innerHTML = hard.map(i => '<li>' + esc(i) + '</li>').join('');
+    } else {
+      hardSection.classList.add('hidden');
+    }
+    if (noting.length > 0) {
+      notingSection.classList.remove('hidden');
+      document.getElementById('worthNotingList').innerHTML = noting.map(i => '<li>' + esc(i) + '</li>').join('');
+    } else {
+      notingSection.classList.add('hidden');
+    }
+  } else {
+    reqCard.classList.add('hidden');
+  }
+
+  renderSummary();
+  renderSkills();
+  renderExperience();
+  updateCounts();
+}
+
+function renderSummary() {
+  const s = suggestions.summary_suggestion;
+  if (!s) return;
+  const key = 'summary';
+  const d = decisions[key];
+  const status = d ? d.status : 'pending';
+
+  const ss = suggestions.section_scores?.summary;
+  let h = '<div class="suggestion ' + (status === 'pending' ? '' : status) + '">';
+  h += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">';
+  h += '<div class="suggestion-label" style="margin:0;">Current</div>';
+  if (ss) h += sectionScoreBadge(ss, effectiveSectionAfter('summary', ss));
+  h += '</div>';
+  h += '<div class="original-text">' + esc(s.original) + '</div>';
+  h += '<div class="suggestion-label" style="margin-top:10px;">Suggested</div>';
+
+  if (status === 'edited') {
+    h += '<textarea class="edit-area" id="edit-summary" oninput="onEdit(\'summary\')">' + esc(d.value) + '</textarea>';
+  } else {
+    h += '<div class="suggested-text">' + esc(d && d.status === 'approved' ? d.value : s.suggested) + '</div>';
+  }
+
+  if (s.reasoning) h += '<div class="suggestion-reasoning">' + esc(s.reasoning) + '</div>';
+  if (s.warnings) h += '<div class="suggestion-warning">Warning: ' + esc(s.warnings.join(', ')) + '</div>';
+
+  h += '<div class="btn-group">';
+  if (status === 'pending') {
+    h += btn('Approve', 'btn-sm btn-success', "decide('summary','approved',suggestions.summary_suggestion.suggested)");
+    h += btn('Reject', 'btn-sm btn-danger', "decide('summary','rejected','')");
+    h += btn('Edit', 'btn-sm btn-outline', "startEdit('summary',suggestions.summary_suggestion.suggested)");
+    h += btn('Redo', 'btn-sm btn-outline', "showRedo('summary')");
+  } else {
+    h += btn('Undo', 'btn-sm btn-outline', "undecide('summary')");
+    if (status === 'edited') h += btn('Confirm Edit', 'btn-sm btn-success', "confirmEdit('summary')");
+  }
+  h += '</div>';
+  h += '<div class="redo-row hidden" id="redo-row-summary">';
+  h += '<input type="text" id="redo-fb-summary" placeholder="What should be different? (optional)" />';
+  h += btn('Regenerate', 'btn-sm btn-primary', "triggerRedo('summary')");
+  h += '<span id="redo-spin-summary" class="card-spinner hidden"></span>';
+  h += '</div>';
+  h += '</div>';
+  document.getElementById('summarySuggestion').innerHTML = h;
+}
+
+function renderSkills() {
+  const s = suggestions.skills_suggestion;
+  if (!s) return;
+  const key = 'skills';
+  const d = decisions[key];
+  const status = d ? d.status : 'pending';
+  const sk_s = suggestions.section_scores?.skills;
+
+  const added = new Set(s.added || []);
+  const removed = new Set(s.removed || []);
+
+  // In edit mode, _skillEditorList holds the live state
+  if (!window._skillEditorList) {
+    window._skillEditorList = (s.suggested || []).slice();
+  }
+
+  const isEditing = status === 'edited';
+  const isApproved = status === 'approved';
+  let displaySkills;
+  if (isEditing) {
+    displaySkills = window._skillEditorList;
+  } else if (isApproved && decisions['skills']?.value) {
+    try { displaySkills = JSON.parse(decisions['skills'].value); } catch(e) { displaySkills = s.suggested || []; }
+  } else {
+    displaySkills = s.suggested || [];
+  }
+
+  let h = '<div class="suggestion ' + (status === 'pending' ? '' : status) + '">';
+  h += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">';
+  h += '<div class="suggestion-label" style="margin:0;">Skills</div>';
+  if (sk_s) h += sectionScoreBadge(sk_s, effectiveSectionAfter('skills', sk_s));
+  h += '</div>';
+
+  if (s.reasoning) h += '<div class="suggestion-reasoning" style="margin-bottom:10px;">' + esc(s.reasoning) + '</div>';
+
+  if (isEditing) {
+    // Tag editor
+    h += '<div class="tag-editor" id="skillTagEditor">';
+    displaySkills.forEach((sk, i) => {
+      const cls = added.has(sk) ? 'tag-added' : '';
+      h += '<span class="tag-chip ' + cls + '" draggable="true" data-index="' + i + '" data-skill="' + esc(sk) + '" ' +
+        'ondragstart="skillDragStart(event)" ondragover="skillDragOver(event)" ' +
+        'ondrop="skillDrop(event)" ondragleave="skillDragLeave(event)">' +
+        esc(sk) +
+        '<button class="tag-x" onclick="skillRemove(' + i + ')" title="Remove">&#x2715;</button>' +
+        '</span>';
+    });
+    if (removed.size > 0) {
+      removed.forEach(sk => {
+        h += '<span class="tag-chip tag-removed" title="Suggested removal (click X to keep it removed or ignore)">' +
+          esc(sk) + '</span>';
+      });
+    }
+    h += '</div>';
+    h += '<div class="tag-add-row">';
+    h += '<input type="text" id="skillAddInput" placeholder="Add a skill..." onkeydown="if(event.key===\'Enter\')skillAdd()" />';
+    h += btn('Add', 'btn-sm btn-outline', 'skillAdd()');
+    h += btn('Accept Suggested Order', 'btn-sm btn-outline', 'skillAcceptSuggested()');
+    h += btn('Reset to Original', 'btn-sm btn-outline', 'skillResetToOriginal()');
+    h += '</div>';
+  } else {
+    h += '<div class="skills-grid" style="margin-bottom:6px;">';
+    displaySkills.forEach(sk => {
+      h += '<span class="skill-tag ' + (added.has(sk) ? 'added' : '') + '">' + esc(sk) + '</span>';
+    });
+    h += '</div>';
+    if (removed.size > 0) {
+      h += '<div class="suggestion-label" style="margin-top:8px;">Suggested Removals</div>';
+      h += '<div class="skills-grid">';
+      removed.forEach(sk => { h += '<span class="skill-tag removed">' + esc(sk) + '</span>'; });
+      h += '</div>';
+    }
+  }
+
+  h += '<div class="btn-group" style="margin-top:10px;">';
+  if (status === 'pending') {
+    h += btn('Approve', 'btn-sm btn-success', "skillApprove()");
+    h += btn('Reject', 'btn-sm btn-danger', "decide('skills','rejected','')");
+    h += btn('Edit', 'btn-sm btn-outline', "skillStartEdit()");
+    h += btn('Redo', 'btn-sm btn-outline', "showRedo('skills')");
+  } else if (isEditing) {
+    const saveLabel = window._skillSaveFlash ? 'Saved!' : 'Save';
+    h += btn(saveLabel, 'btn-sm btn-outline', "skillSave()");
+    h += btn('Approve', 'btn-sm btn-success', "skillSaveEdit()");
+    h += btn('Cancel', 'btn-sm btn-outline', "undecide('skills')");
+  } else {
+    h += btn('Undo', 'btn-sm btn-outline', "undecide('skills')");
+  }
+  h += '</div>';
+  h += '<div class="redo-row hidden" id="redo-row-skills">';
+  h += '<input type="text" id="redo-fb-skills" placeholder="What should be different? (optional)" />';
+  h += btn('Regenerate', 'btn-sm btn-primary', "triggerRedo('skills')");
+  h += '<span id="redo-spin-skills" class="card-spinner hidden"></span>';
+  h += '</div>';
+  h += '</div>';
+  document.getElementById('skillsSuggestion').innerHTML = h;
+}
+
+function renderExperience() {
+  const exps = suggestions.experience_suggestions || [];
+  if (exps.length === 0) {
+    document.getElementById('experienceSuggestions').innerHTML =
+      '<p style="color:var(--text-dim);font-size:13px;">No bullet changes suggested. Your experience section looks good for this role.</p>';
+    return;
+  }
+
+  let h = '';
+  exps.forEach((exp, i) => {
+    const key = 'exp_' + i;
+    const d = decisions[key];
+    const status = d ? d.status : 'pending';
+
+    const ex_s = suggestions.section_scores?.experience;
+    h += '<div class="suggestion ' + (status === 'pending' ? '' : status) + '">';
+    h += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">';
+    h += '<div class="suggestion-label" style="margin:0;">' + esc(exp.job_title) + ' - Bullet ' + (exp.bullet_index + 1) + '</div>';
+    if (ex_s && i === 0) h += sectionScoreBadge(ex_s, effectiveSectionAfter('experience', ex_s));
+    h += '</div>';
+    h += '<div class="original-text">' + esc(exp.original) + '</div>';
+    h += '<div class="suggestion-label" style="margin-top:8px;">Suggested</div>';
+
+    if (status === 'edited') {
+      h += '<textarea class="edit-area" id="edit-' + key + '" oninput="onEdit(\'' + key + '\')">' + esc(d.value) + '</textarea>';
+    } else {
+      h += '<div class="suggested-text">' + esc(d && d.status === 'approved' ? d.value : exp.suggested) + '</div>';
+    }
+
+    if (exp.reasoning) h += '<div class="suggestion-reasoning">' + esc(exp.reasoning) + '</div>';
+    if (exp.warnings) h += '<div class="suggestion-warning">Warning: ' + esc(exp.warnings.join(', ')) + '</div>';
+
+    h += '<div class="btn-group">';
+    if (status === 'pending') {
+      h += btn('Approve', 'btn-sm btn-success', "decide('" + key + "','approved',suggestions.experience_suggestions[" + i + "].suggested)");
+      h += btn('Reject', 'btn-sm btn-danger', "decide('" + key + "','rejected','')");
+      h += btn('Edit', 'btn-sm btn-outline', "startEdit('" + key + "',suggestions.experience_suggestions[" + i + "].suggested)");
+      h += btn('Redo', 'btn-sm btn-outline', "showRedo('" + key + "')");
+    } else {
+      h += btn('Undo', 'btn-sm btn-outline', "undecide('" + key + "')");
+      if (status === 'edited') h += btn('Confirm Edit', 'btn-sm btn-success', "confirmEdit('" + key + "')");
+    }
+    h += '</div>';
+    h += '<div class="redo-row hidden" id="redo-row-' + key + '">';
+    h += '<input type="text" id="redo-fb-' + key + '" placeholder="What should be different? (optional)" />';
+    h += btn('Regenerate', 'btn-sm btn-primary', "triggerRedo('" + key + "')");
+    h += '<span id="redo-spin-' + key + '" class="card-spinner hidden"></span>';
+    h += '</div>';
+    h += '</div>';
+  });
+  document.getElementById('experienceSuggestions').innerHTML = h;
+}
+
+function decide(key, status, value) {
+  decisions[key] = { status: status, value: value };
+  rerenderAll();
+}
+
+function undecide(key) {
+  delete decisions[key];
+  rerenderAll();
+}
+
+function startEdit(key, defaultValue) {
+  decisions[key] = { status: 'edited', value: defaultValue };
+  rerenderAll();
+  setTimeout(() => { const el = document.getElementById('edit-' + key); if (el) el.focus(); }, 50);
+}
+
+// Skills tag editor helpers
+function getCurrentSkillsFromEditor() {
+  const editor = document.getElementById('skillTagEditor');
+  if (editor) {
+    const chips = editor.querySelectorAll('.tag-chip:not(.tag-removed)');
+    if (chips.length > 0) {
+      return Array.from(chips).map(el => el.dataset.skill).filter(Boolean);
+    }
+  }
+  // Fall back to in-memory list only — never use original suggestion as a fallback
+  return window._skillEditorList ? window._skillEditorList.slice() : [];
+}
+
+function skillApprove() {
+  // Called from pending state — no editor visible, approve the suggested list as-is
+  const list = (suggestions.skills_suggestion.suggested || []).slice();
+  decide('skills', 'approved', JSON.stringify(list));
+}
+
+function skillSave() {
+  const list = getCurrentSkillsFromEditor();
+  window._skillEditorList = list;
+  decisions['skills'] = { status: 'edited', value: JSON.stringify(list) };
+  window._skillSaveFlash = true;
+  renderSkills();
+  setTimeout(() => { window._skillSaveFlash = false; renderSkills(); }, 1200);
+}
+
+function skillStartEdit() {
+  window._skillEditorList = (suggestions.skills_suggestion.suggested || []).slice();
+  decisions['skills'] = { status: 'edited', value: JSON.stringify(window._skillEditorList) };
+  renderSkills();
+}
+
+function skillSaveEdit() {
+  const list = getCurrentSkillsFromEditor();
+  decide('skills', 'approved', JSON.stringify(list));
+  window._skillEditorList = null;
+}
+
+function skillRemove(index) {
+  window._skillEditorList.splice(index, 1);
+  decisions['skills'] = { status: 'edited', value: JSON.stringify(window._skillEditorList) };
+  renderSkills();
+}
+
+function skillAdd() {
+  const input = document.getElementById('skillAddInput');
+  const val = input ? input.value.trim() : '';
+  if (!val) return;
+  if (!window._skillEditorList.includes(val)) {
+    window._skillEditorList.push(val);
+    decisions['skills'] = { status: 'edited', value: JSON.stringify(window._skillEditorList) };
+  }
+  if (input) input.value = '';
+  renderSkills();
+  setTimeout(() => { const el = document.getElementById('skillAddInput'); if (el) el.focus(); }, 50);
+}
+
+function skillAcceptSuggested() {
+  window._skillEditorList = (suggestions.skills_suggestion.suggested || []).slice();
+  decisions['skills'] = { status: 'edited', value: JSON.stringify(window._skillEditorList) };
+  renderSkills();
+}
+
+function skillResetToOriginal() {
+  window._skillEditorList = (suggestions.skills_suggestion.original || []).slice();
+  decisions['skills'] = { status: 'edited', value: JSON.stringify(window._skillEditorList) };
+  renderSkills();
+}
+
+// Drag-and-drop for skill tags
+let _dragSrcIndex = null;
+
+function skillDragStart(event) {
+  _dragSrcIndex = parseInt(event.currentTarget.dataset.index);
+  event.dataTransfer.effectAllowed = 'move';
+}
+
+function skillDragOver(event) {
+  event.preventDefault();
+  event.dataTransfer.dropEffect = 'move';
+  event.currentTarget.classList.add('drag-over');
+}
+
+function skillDragLeave(event) {
+  event.currentTarget.classList.remove('drag-over');
+}
+
+function skillDrop(event) {
+  event.preventDefault();
+  event.currentTarget.classList.remove('drag-over');
+  const targetIndex = parseInt(event.currentTarget.dataset.index);
+  if (_dragSrcIndex === null || _dragSrcIndex === targetIndex) return;
+  const list = window._skillEditorList;
+  const [moved] = list.splice(_dragSrcIndex, 1);
+  list.splice(targetIndex, 0, moved);
+  _dragSrcIndex = null;
+  decisions['skills'] = { status: 'edited', value: JSON.stringify(list) };
+  renderSkills();
+}
+
+function onEdit(key) {
+  const el = document.getElementById('edit-' + key);
+  if (el && decisions[key]) decisions[key].value = el.value;
+}
+
+function confirmEdit(key) {
+  if (decisions[key]) decisions[key].status = 'approved';
+  rerenderAll();
+}
+
+function rerenderAll() {
+  renderSummary();
+  renderSkills();
+  renderExperience();
+  updateCounts();
+}
+
+function updateCounts() {
+  const total = 1 + 1 + (suggestions?.experience_suggestions?.length || 0);
+  const reviewed = Object.values(decisions).filter(d => d.status === 'approved' || d.status === 'rejected').length;
+  document.getElementById('approvalCount').textContent = reviewed + ' of ' + total + ' reviewed';
+  const clBtn = document.getElementById('generateCLBtn');
+  if (clBtn) clBtn.disabled = reviewed === 0;
+}
+
+let _previewBlobUrl = null;
+
+function buildFinalResume() {
+  const final = JSON.parse(JSON.stringify(baseResume));
+  if (decisions.summary?.status === 'approved') {
+    final.professional_summary = decisions.summary.value;
+  }
+  if (decisions.skills && (decisions.skills.status === 'approved' || decisions.skills.status === 'edited')) {
+    try { final.core_skills = JSON.parse(decisions.skills.value); } catch (e) {}
+  }
+  (suggestions?.experience_suggestions || []).forEach((exp, i) => {
+    const key = 'exp_' + i;
+    if (decisions[key]?.status === 'approved') {
+      const ji = exp.job_index;
+      const bi = exp.bullet_index;
+      if (final.experience[ji] && final.experience[ji].bullets[bi] !== undefined) {
+        final.experience[ji].bullets[bi] = decisions[key].value;
+      }
+    }
+  });
+  final._meta = {
+    company: suggestions?.company || '',
+    role: suggestions?.role || '',
+    exported: new Date().toISOString(),
+  };
+  return final;
+}
+
+async function exportPdf() {
+  setStatus('Generating PDF...');
+
+  try {
+    const res = await fetch('/api/export-pdf', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(buildFinalResume())
+    });
+    if (!res.ok) throw new Error('PDF export failed');
+    const blob = await res.blob();
+
+    if (_previewBlobUrl) URL.revokeObjectURL(_previewBlobUrl);
+    _previewBlobUrl = URL.createObjectURL(blob);
+
+    const resumeName = (baseResume?.name || 'Resume').replace(/\s+/g, '_');
+    const comp = (suggestions?.company || 'Company').replace(/\s+/g, '_');
+    const role = (suggestions?.role || 'Role').replace(/\s+/g, '_');
+    const date = new Date().toISOString().slice(0, 10);
+    document.getElementById('previewFilenameInput').value =
+      resumeName + '_' + comp + '_' + role + '_Resume_' + date;
+
+    document.getElementById('pdfPreviewFrame').src = _previewBlobUrl;
+    document.getElementById('pdfModal').classList.add('open');
+    setStatus('Preview ready');
+  } catch (e) {
+    alert('Export failed: ' + e.message);
+    setStatus('Export error');
+  }
+}
+
+function closePreview() {
+  document.getElementById('pdfModal').classList.remove('open');
+  document.getElementById('pdfPreviewFrame').src = '';
+  setStatus('Review suggestions');
+}
+
+function downloadPreview() {
+  if (!_previewBlobUrl) return;
+  const filename = (document.getElementById('previewFilenameInput').value.trim() || 'resume') + '.pdf';
+  const a = document.createElement('a');
+  a.href = _previewBlobUrl;
+  a.download = filename;
+  a.click();
+  setStep(3);
+  setStatus('PDF downloaded!');
+}
+
+// Cover letter state
+let _clLength = 'standard';
+let _clBlobUrl = null;
+
+function updateClMeta() {
+  const ta = document.getElementById('clTextarea');
+  const meta = document.getElementById('clMeta');
+  if (!ta || !meta) return;
+  const text = ta.value;
+  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+  meta.textContent = words + ' words | ' + text.length + ' characters';
+}
+
+function setCLLength(len) {
+  _clLength = len;
+  ['short','standard','long'].forEach(l => {
+    const el = document.getElementById('cl-len-' + l);
+    if (el) el.classList.toggle('active', l === len);
+  });
+  regenerateCoverLetter();
+}
+
+function setCLTone(tone) {
+  regenerateCoverLetter(tone);
+}
+
+async function generateCoverLetter() {
+  await _callCoverLetterApi('');
+}
+
+async function regenerateCoverLetter(toneOverride) {
+  const currentText = document.getElementById('clTextarea')?.value || '';
+  const feedback = document.getElementById('clFeedbackInput')?.value.trim() || '';
+  await _callCoverLetterApi(toneOverride || 'professional', currentText, feedback);
+}
+
+async function _callCoverLetterApi(tone, currentText = '', feedback = '') {
+  const spinner = document.getElementById('clSpinner');
+  const card = document.getElementById('coverLetterCard');
+  if (spinner) spinner.classList.remove('hidden');
+  if (card) card.classList.remove('hidden');
+  setStatus('Generating cover letter...');
+
+  try {
+    const res = await fetch('/api/cover-letter', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        resume_data: buildFinalResume(),
+        job_description: window._lastJd || '',
+        company: suggestions?.company || '',
+        role: suggestions?.role || '',
+        length: _clLength,
+        tone: tone || 'professional',
+        user_feedback: feedback,
+        current_text: currentText,
+      })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || 'Cover letter generation failed');
+    }
+    const result = await res.json();
+    const ta = document.getElementById('clTextarea');
+    if (ta) ta.value = result.cover_letter || '';
+    const reasoning = document.getElementById('clReasoningText');
+    if (reasoning && result.reasoning) {
+      reasoning.textContent = result.reasoning;
+      reasoning.classList.remove('hidden');
+    }
+    updateClMeta();
+    document.getElementById('clFeedbackInput').value = '';
+    // Pre-populate closing block only on first generation (don't overwrite edits on redo)
+    const closingName = document.getElementById('clClosingName');
+    if (closingName && !closingName.value && baseResume?.name) {
+      closingName.value = baseResume.name;
+    }
+    const closingContact = document.getElementById('clClosingContact');
+    if (closingContact && !closingContact.value && baseResume?.contact) {
+      const c = baseResume.contact;
+      closingContact.value = [c.email, c.phone, c.website].filter(Boolean).join('\n');
+    }
+    setStatus('Cover letter ready');
+  } catch (e) {
+    alert('Cover letter error: ' + e.message);
+    setStatus('Ready');
+  } finally {
+    if (spinner) spinner.classList.add('hidden');
+  }
+}
+
+async function exportCoverLetterPdf() {
+  const text = document.getElementById('clTextarea')?.value || '';
+  if (!text.trim()) return alert('No cover letter text to export.');
+  setStatus('Generating cover letter PDF...');
+
+  try {
+    const res = await fetch('/api/export-cover-letter-pdf', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        cover_letter: text,
+        resume_data: buildFinalResume(),
+        _meta: { company: suggestions?.company || '', role: suggestions?.role || '' },
+        closing_phrase: document.getElementById('clClosingPhrase')?.value.trim() || 'Sincerely,',
+        closing_name: document.getElementById('clClosingName')?.value.trim() || '',
+        closing_contact_lines: (document.getElementById('clClosingContact')?.value || '')
+          .split('\n').map(l => l.trim()).filter(Boolean),
+      })
+    });
+    if (!res.ok) throw new Error('PDF export failed');
+    const blob = await res.blob();
+    if (_clBlobUrl) URL.revokeObjectURL(_clBlobUrl);
+    _clBlobUrl = URL.createObjectURL(blob);
+
+    const resumeName = (baseResume?.name || 'Resume').replace(/\s+/g, '_');
+    const comp = (suggestions?.company || 'Company').replace(/\s+/g, '_');
+    const role = (suggestions?.role || 'Role').replace(/\s+/g, '_');
+    const date = new Date().toISOString().slice(0, 10);
+    document.getElementById('clPreviewFilenameInput').value =
+      resumeName + '_' + comp + '_' + role + '_Cover_Letter_' + date;
+
+    document.getElementById('clPdfPreviewFrame').src = _clBlobUrl;
+    document.getElementById('clPdfModal').classList.add('open');
+    setStatus('Cover letter preview ready');
+  } catch (e) {
+    alert('Export failed: ' + e.message);
+    setStatus('Export error');
+  }
+}
+
+function closeCLPreview() {
+  document.getElementById('clPdfModal').classList.remove('open');
+  document.getElementById('clPdfPreviewFrame').src = '';
+  setStatus('Cover letter ready');
+}
+
+function downloadCLPreview() {
+  if (!_clBlobUrl) return;
+  const filename = (document.getElementById('clPreviewFilenameInput').value.trim() || 'cover_letter') + '.pdf';
+  const a = document.createElement('a');
+  a.href = _clBlobUrl;
+  a.download = filename;
+  a.click();
+}
+
+function resetAll() {
+  suggestions = null;
+  decisions = {};
+  window._skillEditorList = null;
+  _clLength = 'standard';
+  _clBlobUrl = null;
+  document.getElementById('reviewSection').classList.add('hidden');
+  document.getElementById('inputSection').classList.remove('hidden');
+  document.getElementById('jdInput').value = '';
+  document.getElementById('analyzeBtn').disabled = false;
+  setStep(1);
+  setStatus('Ready');
+}
+
+function setStatus(msg) { document.getElementById('statusText').textContent = msg; }
+
+function setStep(n) {
+  [1, 2, 3].forEach(i => {
+    document.getElementById('step' + i).className = 'step' + (i === n ? ' active' : i < n ? ' done' : '');
+  });
+}
+
+function esc(str) {
+  if (!str) return '';
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+function btn(label, cls, onclick) {
+  return '<button class="btn ' + cls + '" onclick="' + onclick + '">' + label + '</button>';
+}
+
+function sectionScoreBadge(ss, effectiveAfter) {
+  return '<span class="section-score">' +
+    '<span style="color:var(--yellow)">' + ss.before + '%</span>' +
+    '<span style="color:var(--text-dim);font-size:10px;">&rarr;</span>' +
+    '<span style="color:var(--green)">' + effectiveAfter + '%</span>' +
+    '</span>';
+}
+
+function effectiveSectionAfter(section, ss) {
+  if (!ss) return 0;
+  if (section === 'summary') {
+    const d = decisions['summary'];
+    if (d && d.status === 'rejected') return ss.before;
+    return ss.after;
+  }
+  if (section === 'skills') {
+    const d = decisions['skills'];
+    if (d && d.status === 'rejected') return ss.before;
+    return ss.after;
+  }
+  if (section === 'experience') {
+    const exps = suggestions.experience_suggestions || [];
+    if (exps.length === 0) return ss.before;
+    const approved = exps.filter((_, i) => decisions['exp_' + i]?.status === 'approved').length;
+    const total = exps.length;
+    // Interpolate: 0 approved = before, all approved = after
+    return Math.round(ss.before + (ss.after - ss.before) * (approved / total));
+  }
+  return ss.after;
+}
+
+function showRedo(key) {
+  const row = document.getElementById('redo-row-' + key);
+  if (row) {
+    row.classList.toggle('hidden');
+    const input = document.getElementById('redo-fb-' + key);
+    if (input && !row.classList.contains('hidden')) input.focus();
+  }
+}
+
+async function triggerRedo(key) {
+  const fbEl = document.getElementById('redo-fb-' + key);
+  const spinEl = document.getElementById('redo-spin-' + key);
+  const feedback = fbEl ? fbEl.value.trim() : '';
+
+  let section, original, previousSuggestion;
+
+  if (key === 'summary') {
+    section = 'summary';
+    original = suggestions.summary_suggestion.original;
+    previousSuggestion = suggestions.summary_suggestion.suggested;
+  } else if (key === 'skills') {
+    section = 'skills';
+    original = JSON.stringify(suggestions.skills_suggestion.original || []);
+    previousSuggestion = JSON.stringify(suggestions.skills_suggestion.suggested || []);
+  } else {
+    const i = parseInt(key.replace('exp_', ''));
+    const exp = suggestions.experience_suggestions[i];
+    section = 'experience_bullet';
+    original = exp.original;
+    previousSuggestion = exp.suggested;
+  }
+
+  if (spinEl) spinEl.classList.remove('hidden');
+
+  try {
+    const res = await fetch('/api/regenerate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        section,
+        original,
+        previous_suggestion: previousSuggestion,
+        job_description: window._lastJd || '',
+        user_feedback: feedback,
+      })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || 'Regeneration failed');
+    }
+    const result = await res.json();
+
+    // Patch the suggestion in-place and reset decision
+    if (key === 'summary') {
+      suggestions.summary_suggestion.suggested = result.suggested;
+      if (result.reasoning) suggestions.summary_suggestion.reasoning = result.reasoning;
+    } else if (key === 'skills') {
+      if (result.suggested) suggestions.skills_suggestion.suggested = result.suggested;
+      if (result.added) suggestions.skills_suggestion.added = result.added;
+      if (result.removed) suggestions.skills_suggestion.removed = result.removed;
+      if (result.reasoning) suggestions.skills_suggestion.reasoning = result.reasoning;
+    } else {
+      const i = parseInt(key.replace('exp_', ''));
+      suggestions.experience_suggestions[i].suggested = result.suggested;
+      if (result.reasoning) suggestions.experience_suggestions[i].reasoning = result.reasoning;
+    }
+
+    delete decisions[key];
+    rerenderAll();
+  } catch (e) {
+    alert('Redo failed: ' + e.message);
+    if (spinEl) spinEl.classList.add('hidden');
+  }
+}
+
+// Resume management panel
+function openResumePanel() {
+  document.getElementById('resumePanel').classList.add('open');
+  reloadJsonEditor();
+  updateResumeNameDisplay();
+}
+
+function closeResumePanel() {
+  document.getElementById('resumePanel').classList.remove('open');
+}
+
+function updateResumeNameDisplay() {
+  const el = document.getElementById('resumeNameDisplay');
+  if (baseResume && baseResume.name) {
+    el.textContent = baseResume.name + ' — loaded';
+  } else if (baseResume) {
+    el.textContent = 'Resume loaded';
+  } else {
+    el.textContent = 'No resume loaded';
+  }
+}
+
+function reloadJsonEditor() {
+  document.getElementById('jsonEditor').value = baseResume ? JSON.stringify(baseResume, null, 2) : '';
+  document.getElementById('jsonSaveStatus').textContent = '';
+}
+
+async function saveResumeJson() {
+  const raw = document.getElementById('jsonEditor').value;
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (e) {
+    document.getElementById('jsonSaveStatus').textContent = 'Invalid JSON: ' + e.message;
+    document.getElementById('jsonSaveStatus').style.color = 'var(--red)';
+    return;
+  }
+  try {
+    const res = await fetch('/api/resume', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(parsed)
+    });
+    if (!res.ok) throw new Error('Save failed');
+    baseResume = parsed;
+    updateResumeNameDisplay();
+    document.getElementById('jsonSaveStatus').textContent = 'Saved successfully.';
+    document.getElementById('jsonSaveStatus').style.color = 'var(--green)';
+  } catch (e) {
+    document.getElementById('jsonSaveStatus').textContent = 'Error: ' + e.message;
+    document.getElementById('jsonSaveStatus').style.color = 'var(--red)';
+  }
+}
+
+function handleDrop(event) {
+  event.preventDefault();
+  document.getElementById('uploadArea').classList.remove('drag-over');
+  const file = event.dataTransfer.files[0];
+  if (file && file.type === 'application/pdf') handlePdfUpload(file);
+  else {
+    document.getElementById('uploadStatus').textContent = 'Please drop a PDF file.';
+    document.getElementById('uploadStatus').style.color = 'var(--red)';
+  }
+}
+
+async function handlePdfUpload(file) {
+  if (!file) return;
+  const statusEl = document.getElementById('uploadStatus');
+  statusEl.textContent = 'Uploading and parsing PDF...';
+  statusEl.style.color = 'var(--text-dim)';
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const res = await fetch('/api/resume/upload-pdf', { method: 'POST', body: formData });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || 'Upload failed');
+    }
+    baseResume = await res.json();
+    reloadJsonEditor();
+    updateResumeNameDisplay();
+    statusEl.textContent = 'Resume uploaded and parsed successfully.';
+    statusEl.style.color = 'var(--green)';
+    // If arriving from the welcome screen, transition to main UI
+    if (!document.getElementById('welcomeScreen').classList.contains('hidden')) {
+      setTimeout(() => { hideWelcomeScreen(); closeResumePanel(); }, 800);
+    }
+  } catch (e) {
+    statusEl.textContent = 'Error: ' + e.message;
+    statusEl.style.color = 'var(--red)';
+  }
+  document.getElementById('pdfFileInput').value = '';
+}
+</script>
+</body>
+</html>

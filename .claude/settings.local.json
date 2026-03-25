@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash('BASE=c:/Users/Haged/Documents/Cloud/Job Hunting Dashboard/public/THE_RESUMEATOR' __NEW_LINE_58a1e08e3e3c0bd7__ echo '=== SECURITY STRUCTURE CHECK ===' __NEW_LINE_58a1e08e3e3c0bd7__ echo '--- .gitignore contents ---' cat $BASE/.gitignore __NEW_LINE_58a1e08e3e3c0bd7__ echo echo '--- .env exists? ---' ls -la $BASE/.env)",
+      "Bash(echo '.env not present — OK' __NEW_LINE_58a1e08e3e3c0bd7__ echo echo '--- .env.example contents ---' cat $BASE/.env.example __NEW_LINE_58a1e08e3e3c0bd7__ echo echo '--- data/ contents ---' ls $BASE/data/ __NEW_LINE_58a1e08e3e3c0bd7__ echo echo '--- data/base_resume.json exists? ---' ls $BASE/data/base_resume.json)",
+      "Bash(echo 'Not present — OK' __NEW_LINE_58a1e08e3e3c0bd7__ echo echo '--- history/ contents ---' ls $BASE/history/)",
+      "Bash(echo '\\(empty or missing\\)' find $BASE/history/ -mindepth 1)",
+      "Bash(xargs echo:*)"
+    ]
+  }
+}
