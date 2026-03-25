@@ -4,7 +4,7 @@
 
 An AI-powered resume and cover letter tailoring agent that analyzes job descriptions, suggests targeted changes, and exports clean PDFs. You review, approve, edit, or reject every suggestion before anything goes on paper. No AI slop. No buzzword bingo. Just a sharp resume that sounds like you wrote it.
 
-Built by a career transitioner who got tired of manually rewriting the same resume 50 different ways. Works for any profession — tech, sales, HR, operations, whatever you do.
+Built by a career transitioner who got tired of manually rewriting the same resume 50 different ways. Works for any profession, whatever you do.
 
 ---
 
@@ -17,7 +17,7 @@ Built by a career transitioner who got tired of manually rewriting the same resu
 5. **Generate a tailored cover letter** with full editing controls
 6. **Preview and export** matching PDFs ready to submit
 
-No changes happen without your approval. You're in control the entire time.
+No changes happen without your approval.
 
 ---
 
