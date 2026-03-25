@@ -13,7 +13,7 @@ Built by a career transitioner who got tired of manually rewriting the same resu
 1. **Paste a job description** into the web UI
 2. **The Resumeator parses the JD** into structured requirements (skills, tools, certs, experience)
 3. **Analyzes your resume** against those requirements with gap analysis and match scoring
-4. **Review every suggestion** — approve, reject, edit inline, or ask for a redo
+4. **Review every suggestion** approve, reject, edit inline, or ask for a redo
 5. **Generate a tailored cover letter** with full editing controls
 6. **Preview and export** matching PDFs ready to submit
 
