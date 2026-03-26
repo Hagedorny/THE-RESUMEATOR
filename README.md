@@ -1,4 +1,5 @@
 # THE RESUMEATOR
+![Welcome Screen](docs/images/Welcome_screen.png)
 
 **"I'll be back... with a tailored resume."**
 
