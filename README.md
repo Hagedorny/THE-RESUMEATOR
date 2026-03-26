@@ -95,7 +95,7 @@ git clone https://github.com/yourusername/the-resumeator.git
 cd the-resumeator
 ```
 
-### 2. Set up Python environment
+### 2. Set up Python environment. This creates a sandbox like environment for you to run this tool that wont affect your system. 
 
 ```bash
 python -m venv .venv
@@ -115,7 +115,7 @@ pip install -r requirements.txt
 
 ### 4. Add your API key
 
-Get a key from [console.anthropic.com](https://console.anthropic.com/settings/keys). Then create a `.env` file:
+Get a key from [console.anthropic.com](https://console.anthropic.com/settings/keys). Then create a `.env` file (you can also just rename the .env.example delete "example":
 
 ```bash
 echo ANTHROPIC_API_KEY=your-key-here > .env
@@ -125,9 +125,8 @@ Cost: ~$0.02-0.03 per tailoring run. $10 covers 200-400+ resumes.
 
 ### 5. Add your resume
 
-**Option A:** Edit `data/base_resume_example.json` with your own information, then rename it to `data/base_resume.json`
-
-**Option B:** Start the app and use the welcome screen to upload your resume PDF — the AI will parse it into the right format automatically
+Start the app and use the welcome screen to upload your resume PDF. 
+The AI will parse it into the right format automatically
 
 The example resume uses a generic operations/project management background to show the format. Replace it with your own info regardless of your profession.
 
