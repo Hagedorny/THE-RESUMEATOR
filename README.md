@@ -10,7 +10,7 @@ Built by a career transitioner who got tired of manually rewriting the same resu
 ---
 
 ## What It Does
-im using a random project manager role for this example. it can work with anything. Please remember the to upload a resume with minimal design. no fancy fonts. no weird tables. keep it simple spend sometime on the fisrt one to make yourself sound as good as you can. The RESUMEATOR works off of your input. 
+Im using a random project manager role for this example. It can work with anything. Please remember the to upload a resume with minimal design. No fancy fonts. No weird tables. Keep it simple spend sometime on the fisrt one to make yourself sound as good as you can. THE RESUMEATOR works off of your input. 
 
 1. **Paste a job description** into the web UI 
 ![PasteJD](Images/paste_job_description.png)
