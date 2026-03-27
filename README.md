@@ -1,5 +1,5 @@
 # THE RESUMEATOR
-![Welcome Screen](docs/images/Welcome_screen.png)
+![Welcome Screen](Images/Welcome_screen.png)
 
 **"I'll be back... with a tailored resume."**
 
@@ -10,13 +10,23 @@ Built by a career transitioner who got tired of manually rewriting the same resu
 ---
 
 ## What It Does
+im using a random project manager role for this example. it can work with anything. Please remember the to upload a resume with minimal design. no fancy fonts. no weird tables. keep it simple spend sometime on the fisrt one to make yourself sound as good as you can. The RESUMEATOR works off of your input. 
 
-1. **Paste a job description** into the web UI
+1. **Paste a job description** into the web UI 
+![PasteJD](Images/paste_job_description.png)
 2. **The Resumeator parses the JD** into structured requirements (skills, tools, certs, experience)
+![PasteJD](Images/keyword_match.png)
 3. **Analyzes your resume** against those requirements with gap analysis and match scoring
+![PasteJD](Images/requirement_check.png)
+![PasteJD](Images/core_skills.png)
 4. **Review every suggestion** approve, reject, edit inline, or ask for a redo
-5. **Generate a tailored cover letter** with full editing controls
-6. **Preview and export** matching PDFs ready to submit
+![PasteJD](Images/professional_summary.png)
+![PasteJD](Images/bulletpoint.png)
+6. **Generate a tailored cover letter** with full editing controls
+![PasteJD](Images/coverletter_generation.png)
+7. **Preview and export** matching PDFs ready to submit
+![PasteJD](Images/alex_jonson_ex_resume.png)
+![PasteJD](Images/alex_jonson_ex_coverleter.png)
 
 No changes happen without your approval.
 
